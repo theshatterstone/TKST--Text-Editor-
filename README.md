@@ -1,7 +1,7 @@
 # TKST--Text-Editor-
 This is a Text Editor I'm working on using Python and Tkinter.
 
-For anyone wondering, the name comes from a word play on 'text' and 'tk', because this is a text editor made uisng tkinter.
+For anyone wondering, the name comes from a word play on 'text' and 'tk', because this is a text editor made using tkinter.
 I'm doing this with the aim of learning some basic GUI programming. 
 
 Copyright 2022 Aleksandar Gerenski
