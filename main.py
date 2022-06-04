@@ -1,9 +1,6 @@
-from curses import update_lines_cols
-from gc import disable
 from tkinter import *
-from turtle import undo, update
 
-from click import command
+
 root = Tk()
 #Program name
 root.title('TKST text editor')
@@ -23,9 +20,14 @@ def cut():
 
 def copy():
     textbox_area.event_generate('<<Copy>>')
+    on_content_change
 
 def paste():
     textbox_area.event_generate('<<Paste>>')
+    on_content_change
+
+def undo():
+    textbox_area.event_generate('<<Undo>>')
     on_content_change
 
 def redo(event=None):
