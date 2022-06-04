@@ -1,0 +1,9 @@
+Next Steps:
+
+	-Find and Replace to be implemented
+
+	-File handling (The 'File' section of the file bar) to be implemented
+
+	-Themes to be implemented
+
+	-Creating Right-click menu
