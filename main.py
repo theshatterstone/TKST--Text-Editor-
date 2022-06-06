@@ -1,11 +1,14 @@
+from email.policy import default
 from tkinter import *
-
+import tkinter.filedialog
+import os
 
 root = Tk()
 #Program name
-root.title('TKST text editor')
+PROGRAM_NAME = root.title('TKST text editor')
+root.geometry('600x700')
 #all the code goes here
-
+file_name = None
 #variables used below
 show_line_n = IntVar()
 show_line_n.set(1)
@@ -40,6 +43,42 @@ def select_all(event=None):
     on_content_change
     return 'break'
 
+def find_text(event=NONE):
+    search_window = Toplevel(root)
+    search_window.title('Find')
+    search_window.transient(root)
+    search_window.resizable(False,False)
+    Label(search_window, text='Find').grid(row=0, column=0, sticky= 'e')
+    search_entry = Entry(search_window, width=25)
+    search_entry.grid(row=0, column=1, padx=2, pady=2, sticky='we')
+    search_window.focus_set()
+    ignore_case_val = IntVar()
+    Checkbutton(search_window, text='Ignore Case', variable=ignore_case_val).grid(row=1, column=1, padx=2, pady=2, sticky='we')
+    Button(search_window, text='Find', underline=0, command=lambda: search_output(search_entry.get(), ignore_case_val.get(), textbox_area, search_window, search_entry)).grid(row=0, column=2, sticky='e'+'w', padx=2, pady=2)
+
+def close_search_win():
+    textbox_area.tag_remove('match', '1.0', END)
+    search_window.destroy()
+    search_window.protocol('WM_DELETE_WINDOW', close_search_win)
+    return "break"
+
+def search_output(needle, if_ignore_case, textbox_area, search_window, search_box):
+    textbox_area
+    matches_count = 0
+    if needle:
+        start_pos = '1.0'
+        while True:
+            start_pos = textbox_area.search(needle, start_pos, nocase =if_ignore_case, stopindex= END)
+            if not start_pos:
+                break
+            end_pos = '{}+{}c'.format(start_pos,len(needle))
+            textbox_area.tag_add('match', start_pos, end_pos)
+            matches_count += 1
+            start_pos = end_pos
+        textbox_area.tag_config('match', foreground = 'red', background = 'yellow')
+    search_box.focus_set()
+    search_window.title('{} matches found'.format(matches_count))
+    
 #current line highlighting
 def highlight_line(interval=100):
     textbox_area.tag_remove('active_line',1.0,'end')
@@ -54,6 +93,47 @@ def toggle_highlight():
         highlight_line()
     else:
         undo_highlight()
+
+# !!! FILE HANDLING !!!
+def open_file(event=None):
+    input_file_name = tkinter.filedialog.askopenfilename(defaultextension='.txt', filetypes=[('All Files', '*.*'), ('Text Documents', '*.txt')])
+    if input_file_name:
+        global file_name
+        file_name = input_file_name
+        root.title('{} - TKST Text Editor'.format(os.path.basename(file_name)))
+        textbox_area.delete(1.0, END)
+        with open(file_name) as _file:
+            textbox_area.insert(1.0, _file.read())
+
+def save_file():
+    global file_name
+    if not file_name:
+        save_as()
+    else:
+        write_to_file(file_name)
+
+def save_as():
+    input_file_name = tkinter.filedialog.asksaveasfilename(defaultextension='.txt', filetypes=[('All Files', '*.*'), ('Text Documents', '*.txt')])
+    if input_file_name:
+        global file_name
+        file_name = input_file_name
+        write_to_file(file_name)
+        root.title('{} - TKST Text Editor'.format(os.path.basename(file_name)))
+        textbox_area.delete(1.0, END)
+        
+def write_to_file():
+    try:
+        content = textbox_area.get('1.0', 'end')
+        with open(file_name, 'w') as the_file:
+            the_file.write(content)
+    except IOError:
+        pass
+
+def new_file():
+    root.title('Untitled')
+    global file_name
+    file_name = None
+    textbox_area.delete('1.0', END)
 
 #cursor info bar at bottom right
 def show_cursor_info_bar():
@@ -78,10 +158,10 @@ top_bar = Menu(root)
 '''
 file_menu = Menu(top_bar, tearoff=0)
 #file menu items
-file_menu.add_command(label='New', accelerator='Ctrl + N', compound='left')
-file_menu.add_command(label='Open', accelerator='Ctrl + O', compound='left')
-file_menu.add_command(label='Save', accelerator='Ctrl + S', compound='left')
-file_menu.add_command(label='Save As', accelerator='Ctrl + Shift + S', compound='left')
+file_menu.add_command(label='New', accelerator='Ctrl + N', compound='left', command=new_file)
+file_menu.add_command(label='Open', accelerator='Ctrl + O', compound='left', command=open_file)
+file_menu.add_command(label='Save', accelerator='Ctrl + S', compound='left', command=save_file)
+file_menu.add_command(label='Save As', accelerator='Ctrl + Shift + S', compound='left', command= save_as)
 
 edit_menu = Menu(top_bar, tearoff=0)
 #edit menu items
@@ -91,6 +171,7 @@ edit_menu.add_command(label='Cut', accelerator='Ctrl + X', compound='left', comm
 edit_menu.add_command(label='Copy', accelerator='Ctrl + C', compound='left', command=copy)
 edit_menu.add_command(label='Paste', accelerator='Ctrl + V', compound='left', command=paste)
 edit_menu.add_command(label='Select All', accelerator='Ctrl + A', compound='left', command=select_all)
+edit_menu.add_command(label='Find', accelerator='Ctrl + F', compound='left', command=find_text)
 
 view_menu = Menu(top_bar, tearoff=0)
 #view menu items
@@ -104,8 +185,8 @@ view_menu.add_checkbutton(label='Highlight current line', onvalue=1, offvalue=0,
 
 about_menu = Menu(top_bar, tearoff=0)
 #about menu items
-edit_menu.add_command(label='New', accelerator='Ctrl + N', compound='left')
-edit_menu.add_command(label='New', accelerator='Ctrl + N', compound='left')
+about_menu.add_command(label='About', compound='left')
+about_menu.add_command(label='Licence', compound='left')
 
 #Adding the menus to the menubar
 top_bar.add_cascade(label='File', menu=file_menu) 
@@ -179,6 +260,13 @@ textbox_area.bind('<Control-y>', redo)
 textbox_area.bind('<Control-Y>', redo)
 textbox_area.bind('<Control-a>', select_all) 
 textbox_area.bind('<Control-A>', select_all)
+textbox_area.bind('<Control-F>', find_text)
+textbox_area.bind('<Control-N>', new_file)
+textbox_area.bind('<Control-O>', open_file)
+textbox_area.bind('<Control-S>', save_file)
+textbox_area.bind('<Control-Shift-S>', save_as)
 
+#test
+file_object = tkinter.filedialog.askopenfile(mode='r')
 
 root.mainloop()

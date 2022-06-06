@@ -1,8 +1,8 @@
 Next Steps:
 
-	-Find and Replace to be implemented
+	-Find and Replace to be implemented --DONE
 
-	-File handling (The 'File' section of the file bar) to be implemented
+	-File handling (The 'File' section of the file bar) to be implemented --DONE
 
 	-Themes to be implemented
 
@@ -11,3 +11,5 @@ Next Steps:
 	-Add padding to text box
 	
 	-BUG: Line number area doesn't work well when the text continues beyond the visible bottom of the page
+
+	-BUG: Open Window opens on startup, causing incorrect window focus, leading to root window being unusable and thus nothing working
