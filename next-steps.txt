@@ -9,3 +9,5 @@ Next Steps:
 	-Creating Right-click menu
 	
 	-Add padding to text box
+	
+	-BUG: Line number area doesn't work well when the text continues beyond the visible bottom of the page
